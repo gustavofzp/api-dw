@@ -1,0 +1,72 @@
+/* Tema automático baseado no sistema */
+@media (prefers-color-scheme: dark) {
+    body {
+      background-color: #0f172a;
+      color: #e5e7eb;
+    }
+  
+    .swagger-ui {
+      background-color: #0f172a;
+    }
+  
+    .swagger-ui .opblock {
+      background: #020617;
+      border-color: #334155;
+    }
+  
+    .swagger-ui .opblock-summary {
+      color: #e5e7eb;
+    }
+  
+    .swagger-ui .info h1,
+    .swagger-ui .info p {
+      color: #e5e7eb;
+    }
+  
+    .swagger-ui input,
+    .swagger-ui select {
+      background: #020617;
+      color: #e5e7eb;
+      border-color: #334155;
+    }
+    .swagger-ui .topbar {
+      background-color: transparent;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    /* ====== AUTO THEME ====== */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: #0f172a;
+      }
+
+      .swagger-ui {
+        filter: invert(1) hue-rotate(180deg);
+      }
+
+      .swagger-ui img {
+        filter: invert(1) hue-rotate(180deg);
+      }
+
+      .topbar-wrapper img {
+        content: url("/static/LIVE!TECH---BCO.png");
+        height: 48px;
+      }
+    }
+
+    @media (prefers-color-scheme: light) {
+      .topbar-wrapper img {
+        content: url("/static/LIVE!TECH---PTO.png");
+        height: 48px;
+      }
+    }
+
+    /* ====== HEADER ====== */
+    .topbar {
+      background-color: transparent !important;
+    }
+
+    .topbar-wrapper img {
+      content: url("/static/LIVE!TECH---PTO.png");
+    }
+  }
+  

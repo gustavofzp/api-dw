@@ -7,19 +7,55 @@ from fastapi import FastAPI, Query, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordBearer
+from fastapi.staticfiles import StaticFiles
+from fastapi.security import HTTPBearer
+from fastapi import Security
+from fastapi.openapi.docs import get_swagger_ui_html
+from .swagger import setup_swagger
 from dotenv import load_dotenv
 
 load_dotenv()
-app = FastAPI()
+app = FastAPI(docs_url="/docs", redoc_url="/redoc")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+security = HTTPBearer()
+app.mount("/static", StaticFiles(directory="src/api_dw/static"), name="static")
+setup_swagger(app)
 
 
-@app.get("/test_token")
-async def protected_route(token: str = Depends(auth.verify_token)):
+
+@app.get("/docs", include_in_schema=False)
+def custom_docs():
+    return get_swagger_ui_html(
+        openapi_url=app.openapi_url,
+        title="API DW - Docs",
+        swagger_css_url="/static/swagger.css",
+        swagger_ui_parameters={
+            "filter": True,
+            "displayRequestDuration": True,
+            "persistAuthorization": True
+        }
+    )
+
+
+
+@app.get(
+    "/test_token",
+    tags=["Autenticação"],
+    summary="Verifica token",
+    description="Endpoint simples para verificar se o token de autenticação é válido."
+)
+async def protected_route(token: str = Security(security)):
+    auth.verify_token(token.credentials)
     return {"mensagem": "Acesso concedido", "token": "ok"}
 
 
-@app.get("/doecho")
+
+@app.get(
+    "/doecho",
+    tags=["Util"],
+    summary="Echo de teste",
+    description="Endpoint simples para teste de conectividade."
+)
 async def doecho(msg: str = Query(default=None, max_length=50)):
     item = {
             "Method": "doecho", 
@@ -30,7 +66,13 @@ async def doecho(msg: str = Query(default=None, max_length=50)):
     return JSONResponse(content=content)
 
 
-@app.get("/estoque_lojas")
+
+@app.get(
+    "/estoque_lojas",
+    tags=["Estoque"],
+    summary="Consulta estoque das lojas",
+    description="Retorna o estoque paginado por loja e produto."
+)
 async def estoque_lojas(
     params: vp.EstoqueLojasParams = Depends(),
     token: str = Depends(auth.verify_token)  # Adiciona a verificação do token como dependência
@@ -62,7 +104,13 @@ async def estoque_lojas(
         return JSONResponse(content=content)
 
 
-@app.get("/imagens_produtos")
+
+@app.get(
+    "/imagens_produtos",
+    tags=["Produtos"],
+    summary="Consulta imagens dos produtos",
+    description="Retorna URLs das imagens por referência e cor."
+)
 async def imagens_produtos(
     params: vp.ImagensProdutosParams = Depends(),
     token: str = Depends(auth.verify_token)
@@ -94,7 +142,13 @@ async def imagens_produtos(
         return JSONResponse(content=content)
     
 
-@app.get("/movimentos_lojas")
+
+@app.get(
+    "/movimentos_lojas",
+    tags=["Movimentos"],
+    summary="Consulta movimentos das lojas",
+    description="Retorna vendas, trocas e cancelamentos por período."
+)
 async def movimentos_lojas(
     params: vp.MovimentosLojasParams = Depends(),
     token: str = Depends(auth.verify_token)    
