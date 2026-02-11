@@ -6,9 +6,9 @@
 - Validate operational store metadata.
 
 ### Filters:
-- `store_id` (optional)
+- `store_code` (optional)
 
-> If no `store_id` is provided, the API returns all stores in the database.
+> If no `store_code` is provided, the API returns all stores in the database.
 
 ### Returns:
 - store_code - `string`

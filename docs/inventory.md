@@ -6,11 +6,11 @@
 - Support replenishment and planning.
 
 ### Filters:
-- store_id (optional)
+- store_code (optional)
 - page
 - size
 
-> If no `store_id` is provided, the API returns inventory positions for all stores in the database. Use the pagination parameters (`page` and `size`) to limit the number of inventory records returned in a single response.
+> If no `store_code` is provided, the API returns inventory positions for all stores in the database. Use the pagination parameters (`page` and `size`) to limit the number of inventory records returned in a single response.
 
 ### Returns:
 - store_code - `string`
