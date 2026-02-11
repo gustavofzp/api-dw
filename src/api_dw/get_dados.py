@@ -53,7 +53,7 @@ def dados_estoque(page, size, loja_id):
         cursor = conn.cursor()
         query = le_query(arquivo="queries/estoque_lojas.sql")
         if loja_id is not None:
-            query = query.replace("    --and lojas.cod_portal =", f"   and lojas.cod_portal = 'L{loja_id}'")
+            query = query.replace("    --and lojas.cod_portal =", f"   and lojas.cod_portal = '{loja_id}'")
         query = query.replace("--LIMIT <page> OFFSET <size>", f"LIMIT {size} OFFSET {(page-1)*size}")
         
         cursor.execute(query)
@@ -114,7 +114,7 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
                     f"   and mov.data_lancamento between to_date('{start_date}','YYYY-MM-DD') and to_date('{end_date}','YYYY-MM-DD')")
         
         if loja_id is not None:
-            query = query.replace("    --and lojas.cod_portal =", f"   and lojas.cod_portal = 'L{loja_id}'")
+            query = query.replace("    --and lojas.cod_portal =", f"   and lojas.cod_portal = '{loja_id}'")
         
         query = query.replace("LIMIT <page> OFFSET <size>", f"LIMIT {size} OFFSET {(page-1)*size}")
         cursor.execute(query)
@@ -138,7 +138,7 @@ def dados_lojas(loja_id):
         query = le_query(arquivo="queries/lojas.sql")
         
         if loja_id is not None:
-            query = query.replace("    --and lojas.cod_portal =", f"   and lojas.cod_portal = 'L{loja_id}'")
+            query = query.replace("    --and lojas.cod_portal =", f"   and lojas.cod_portal = '{loja_id}'")
         cursor.execute(query)
         result = cursor.fetchall()
         if result:
