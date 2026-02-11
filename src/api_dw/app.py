@@ -225,7 +225,12 @@ async def store_transactions(
     "/stores",
     tags=["Stores"],
     summary="Details of each store",
-    description= le_descricao(arquivo="stores.md")
+    description= le_descricao(arquivo="stores.md"),
+    responses={
+        200: SWAGGER_RESPONSES["stores"]["200"],
+        401: {"description": "Unauthorized"},
+        404: {"description": "No product found"}
+    }
 )
 async def stores(
     params: vp.lojasParams = Depends(),
