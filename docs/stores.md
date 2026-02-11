@@ -25,8 +25,8 @@
 - region_name - `string`
 - store_size - `string`
 - opening_date - `Date`
-- is_open_sunday - `integer`
-- is_active - `integer`
+- is_open_sunday - `integer`  (0 or 1)
+- is_active - `integer`  (0 or 1)
 
 ### CNPJ Information:
 - CNPJ stands for Cadastro Nacional da Pessoa Jurídica (National Registry of Legal Entities) in Brazil. It is a 14-digit, mandatory > . federal tax identification number (formatted XX.XXX.XXX/XXXX-XX) issued by the Brazilian Federal Revenue Service to companies, branches, and organizations for legal, tax, and commercial operations. It is used for tax reporting, invoicing, and legal identification of businesses in Brazil.

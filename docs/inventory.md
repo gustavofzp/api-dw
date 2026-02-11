@@ -16,7 +16,7 @@
 - store_code - `string`
 - cnpj - `string`
 - sku - `string`
-- product_stock_date - `Date`
+- product_stock_date - `date`
 - product_stock_quantity - `integer`
 
 ### SKU Information: 

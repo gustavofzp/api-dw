@@ -18,6 +18,27 @@
 - product_stock_date - `Date`
 - product_stock_quantity - `integer`
 
+- store_code  - `string`
+- cnpj  - `string`
+- store_name  - `string`
+- transaction_date - `Date`
+- sku  - `string`
+- color_code  - `string`
+- size_code  - `string`
+- is_canceled  - `integer` (0 or 1)
+- canceled_date - `Date` (null if not canceled)
+- movement_description  - `string`
+- operation  - `char`
+- invoice_series - `char`
+- invoice_number - `integer`
+- seller_code - `integer`
+- is_sale - `integer` (0 or 1)
+- movement_status - - `integer` 
+- quantity - `integer`
+- net_amount - `float`
+- discount_amount - `float` 
+- gross_amount - `float`
+
 ### CNPJ Information:
 - CNPJ stands for Cadastro Nacional da Pessoa Jurídica (National Registry of Legal Entities) in Brazil. It is a 14-digit, mandatory federal tax identification number (formatted XX.XXX.XXX/XXXX-XX) issued by the Brazilian Federal Revenue Service to companies, branches, and organizations for legal, tax, and commercial operations. It is used for tax reporting, invoicing, and legal identification of businesses in Brazil.
 - To make it simple, the API returns only the digits of the `cnpj` without formatting.

@@ -35,7 +35,7 @@
 - collection_name - `string`
 - sub_collection_code - `integer`
 - sub_collection_name - `string`
-- is_active - `integer`
+- is_active - `integer`  (0 or 1)
 
 ### SKU Information: 
 > A Stock Keeping Unit (SKU) is a unique alphanumeric code assigned to products by retailers to track inventory internally. SKUs identify specific product attributes like brand, style, color, and size (e.g., TSH-BLK-08 for a black T-shirt, size 8). Unlike universal barcodes, SKUs are customized by each company to manage stock, analyze sales trends, and improve warehouse efficiency.
