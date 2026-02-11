@@ -200,7 +200,7 @@ async def store_transactions(
         
         # Define headers
         headers = ["store_code","cnpj","store_name","transaction_date","sku","color_code","size_code",
-                    "is_canceled","canceled_date","movement_description","operation","invoice_series",
+                    "is_canceled","canceled_date","movement_description","operation","transaction_type","invoice_series",
                     "invoice_number","seller_code","is_sale","movement_status","quantity","net_amount",
                     "discount_amount","gross_amount"]
         dados = tradutor.ensure_records(dados, headers)

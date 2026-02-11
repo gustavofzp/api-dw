@@ -6,5 +6,6 @@ select
     img_prd.imagem_url  as image_url
 from live.dimg_produtos img_prd
 where 1=1
+    and img_prd.seq_imagem = 1
 --    and img_prd.referencia = 
 --    and img_prd.cor =

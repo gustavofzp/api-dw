@@ -19,7 +19,7 @@ from estoque.fsaldoestoqueinteg estoque
         and lojas.cod_portal = estoque.loja
 where 1=1
     and estoque.data_estoque = (select max(estoque2.data_estoque) from estoque.fsaldoestoqueinteg estoque2)
-    and estoque.qtd_estoque > 0
+    and estoque.qtd_estoque <> 0
     and estoque.situacao = '1'
     --and lojas.cod_portal =
 --LIMIT <page> OFFSET <size>

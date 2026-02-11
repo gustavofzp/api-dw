@@ -28,7 +28,8 @@
 - is_canceled  - `integer` (0 or 1)
 - canceled_date - `Date` (null if not canceled)
 - movement_description  - `string`
-- operation  - `char`
+- operation  - `string`
+- transaction_type - `string`
 - invoice_series - `char`
 - invoice_number - `integer`
 - seller_code - `integer`

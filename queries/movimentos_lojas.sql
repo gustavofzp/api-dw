@@ -27,6 +27,7 @@ select
     mov.datcancel as canceled_date,
     mov.desc_movimento as movement_description,
     mov.operacao as operation,
+    mov.tipo_transacao as transaction_type,
     mov.serie as invoice_series,
     mov.numnf as invoice_number,
     mov.cod_vendedor as seller_code,

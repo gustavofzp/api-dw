@@ -62,14 +62,14 @@
                   "sku": "1.52473.G.EX2462",
                   "color_code": "EX2462",
                   "size_code": "G",
-                  "is_canceled": false,
+                  "is_canceled": 0,
                   "canceled_date": null,
                   "movement_description": "Sale",
                   "operation": "VENDA",
                   "invoice_series": "1",
                   "invoice_number": "998877",
                   "seller_code": "1020",
-                  "is_sale": true,
+                  "is_sale": 1,
                   "movement_status": "OK",
                   "quantity": 2,
                   "net_amount": 199.9,
@@ -107,7 +107,7 @@
                   "region_name": "Sul",
                   "store_size": "98",
                   "opening_date": "2019-05-01",
-                  "is_open_sunday": true
+                  "is_open_sunday": 1
                 }
               ]
             }

@@ -13,13 +13,11 @@ select
     loj.regiao region_name,
     loj.metragem as store_size,
     loj.dt_inauguracao as opening_date,
-    loj.flag_abre_aos_domingos as is_open_sunday,
-    case
-       when loj.situacao = 'ativo' then 1
-       else 0
-    end as is_active
+    loj.flag_abre_aos_domingos as is_open_sunday
 from live.dlojas loj
 where 1=1
+    AND loj.cod_rede IN (6, 12, 7, 18, 8, 36)
+    and loj.situacao = 'ativo'
     --and lojas.cod_portal =
     --and prd.sku =
     --and prd.ativo =
