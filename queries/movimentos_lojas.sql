@@ -1,6 +1,6 @@
 with lojas as(
     select
-        REPLACE('L' || TO_CHAR(loja.cod_portal,'000'), ' ', '') as cod_portal,
+        REPLACE('L' || LPAD(loja.cod_portal::text, 3, '0'), ' ', '') as cod_portal,
         loja.pk_loja as cod_loja,
         loja.pk_cnpj as cnpj,
         loja.desc_apelido as nome_loja,
@@ -10,29 +10,35 @@ with lojas as(
     where loja.cod_rede in (7,8)
 )
 select
-    lojas.cod_portal,
-    lojas.cod_loja,
+    lojas.cod_portal as store_code,
     lojas.cnpj,
-    lojas.nome_loja,
-    mov.data_lancamento,
-    mov.canal_distribuicao,
-    mov.fk_produto,
-    mov.cod_barra,
-    mov.cor,
-    mov.tamanho,
-    mov.cancelado,
-    mov.datcancel,
-    mov.desc_movimento,
-    mov.operacao,
-    mov.rede,
-    mov.serie,
-    mov.numnf,
-    mov.cod_vendedor,
-    mov.considerarvenda,
-    mov.situacao,
-    mov.qtde,
-    mov.valor_liquido,
-    mov.desconto
+    lojas.nome_loja as store_name,
+    mov.data_lancamento as transaction_date,
+    split_part(mov.fk_produto, '-', 4) || '.' ||
+    split_part(mov.fk_produto, '-', 1) || '.' ||
+    split_part(mov.fk_produto, '-', 2) || '.' ||
+    split_part(mov.fk_produto, '-', 3) AS sku,
+    mov.cor as color_code,
+    mov.tamanho as size_code,
+    case 
+       when mov.cancelado = 'N' then 0
+       else 1
+    end as is_canceled,
+    mov.datcancel as canceled_date,
+    mov.desc_movimento as movement_description,
+    mov.operacao as operation,
+    mov.serie as invoice_series,
+    mov.numnf as invoice_number,
+    mov.cod_vendedor as seller_code,
+    case 
+       when mov.considerarvenda = 'N' then 0
+       else 1
+    end as is_sale,
+    mov.situacao as movement_status,
+    mov.qtde as quantity,
+    mov.valor_liquido as net_amount,
+    mov.desconto as discount_amount,
+    mov.valor_bruto as gross_amount
 from jma.fmovimentosinteg mov
     inner join lojas
         on lojas.cnpj = mov.cnpj

@@ -1,0 +1,155 @@
+{
+    "store_inventory": {
+      "200": {
+        "description": "Successful response with inventory data",
+        "content": {
+          "application/json": {
+            "example": {
+              "Method": "store_inventory",
+              "Status": "Success",
+              "Data": [
+                {
+                  "store_code": "L023",
+                  "cnpj": "12345678000190",
+                  "sku": "1.52473.G.EX2462",
+                  "product_stock_date": "2026-02-01",
+                  "product_stock_quantity": 15
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+  
+    "product_images": {
+      "200": {
+        "description": "Successful response with product images",
+        "content": {
+          "application/json": {
+            "example": {
+              "Method": "product_images",
+              "Status": "Success",
+              "Data": [
+                {
+                  "style_color_code": "52473-00MC06",
+                  "style_code": "46551",
+                  "color_code": "00MR69",
+                  "image_sequence": 1,
+                  "image_url": "https://imagens.liveoficial.com.br/product/461194_46551_00MR69_1.jpg"
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+  
+    "store_transactions": {
+      "200": {
+        "description": "Successful response with transaction data",
+        "content": {
+          "application/json": {
+            "example": {
+              "Method": "store_transactions",
+              "Status": "Success",
+              "Data": [
+                {
+                  "store_code": "L023",
+                  "cnpj": "12345678000190",
+                  "store_name": "Live Store Center",
+                  "transaction_date": "2026-02-01",
+                  "sku": "1.52473.G.EX2462",
+                  "color_code": "EX2462",
+                  "size_code": "G",
+                  "is_canceled": false,
+                  "canceled_date": null,
+                  "movement_description": "Sale",
+                  "operation": "VENDA",
+                  "invoice_series": "1",
+                  "invoice_number": "998877",
+                  "seller_code": "1020",
+                  "is_sale": true,
+                  "movement_status": "OK",
+                  "quantity": 2,
+                  "net_amount": 199.9,
+                  "discount_amount": 10.0,
+                  "gross_amount": 209.9
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+  
+    "stores": {
+      "200": {
+        "description": "Successful response with store data",
+        "content": {
+          "application/json": {
+            "example": {
+              "Method": "stores",
+              "Status": "Success",
+              "Data": [
+                {
+                  "store_code": "L023",
+                  "cnpj": "12345678000190",
+                  "store_name": "Live Store Center",
+                  "store_chain_code": "7",
+                  "store_chain_name": "Retail",
+                  "zip_code": "88000000",
+                  "address": "Av. Central, 100",
+                  "city_code": "4205407",
+                  "city_name": "Florianópolis",
+                  "state": "SC",
+                  "region_code": "S",
+                  "region_name": "Sul",
+                  "store_size": "98",
+                  "opening_date": "2019-05-01",
+                  "is_open_sunday": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+  
+    "product_catalog": {
+      "200": {
+        "description": "Successful response with product catalog data",
+        "content": {
+          "application/json": {
+            "example": {
+              "Method": "product_catalog",
+              "Status": "Success",
+              "Data": [
+                {
+                  "sku": "1.52473.G.EX2462",
+                  "erp_product_code": "998877",
+                  "description": "Women's Running Shorts",
+                  "style_code": "52473",
+                  "color_code": "EX2462",
+                  "color_name": "Green",
+                  "size_code": "G",
+                  "size_name": "G / X",
+                  "product_line_code": "10",
+                  "product_line_name": "Performance",
+                  "category_code": "20",
+                  "category_name": "Shorts",
+                  "product_type_code": "05",
+                  "product_type_name": "Running Shorts",
+                  "collection_code": "2026S",
+                  "collection_name": "Summer 2026",
+                  "sub_collection_code": "BEACH",
+                  "sub_collection_name": "Beachwear",
+                  "is_active": true
+                }
+              ]
+            }
+          }
+        }
+      }
+    }
+}  

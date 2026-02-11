@@ -12,10 +12,10 @@ API_TOKEN = os.getenv("TOKEN")
 
 def verify_token(token: str = Depends(oauth2_scheme)):
     try:
-        print("Token carregado do .env:", repr(API_TOKEN))
-        print("Verificando token:", token)  # Log do token recebido
+        #print("Token loaded from .env:", repr(API_TOKEN))
+        #print("Verifying token:", token)  # Log of the received token
         if token.strip() != API_TOKEN.strip():
-            raise HTTPException(status_code=401, detail="Token inválido")
-        return {"message": "Token válido"}
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return {"message": "Valid token"}
     except Exception as e:
         raise HTTPException(status_code=401, detail=str(e))

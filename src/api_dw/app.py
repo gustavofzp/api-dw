@@ -1,6 +1,9 @@
 import os
+import json
+import textwrap
 import src.api_dw.get_dados as get_dados
 import src.api_dw.authentication as auth
+import src.api_dw.tradutor as tradutor
 import src.api_dw.validacao_parametros as vp
 
 from fastapi import FastAPI, Query, HTTPException, Depends
@@ -21,6 +24,32 @@ security = HTTPBearer()
 app.mount("/static", StaticFiles(directory="src/api_dw/static"), name="static")
 setup_swagger(app)
 
+BASE_DIR = os.path.dirname(__file__)
+with open(os.path.join(BASE_DIR, "..", "..", "docs", "swagger_responses.json"), encoding="utf-8") as f:
+    SWAGGER_RESPONSES = json.load(f)
+
+
+
+def le_descricao(arquivo):
+    from pathlib import Path
+    docs_dir = Path(__file__).resolve().parent.parent.parent / "docs"
+    arquivo_path = docs_dir / arquivo
+
+    if not arquivo_path.exists():
+        available = sorted([p.name for p in docs_dir.glob("*.md")]) if docs_dir.exists() else []
+        raise FileNotFoundError(
+            f"Description file not found: {arquivo_path}\n"
+            f"Docs directory: {docs_dir}\n"
+            f"Available files: {available}"
+        )
+
+    with arquivo_path.open("r", encoding="utf-8") as f:
+        texto = f.read()
+
+    texto = texto.replace("\r\n", "\n")
+    texto = textwrap.dedent(texto).strip()
+    return texto
+
 
 
 @app.get("/docs", include_in_schema=False)
@@ -40,26 +69,26 @@ def custom_docs():
 
 @app.get(
     "/test_token",
-    tags=["Autenticação"],
-    summary="Verifica token",
-    description="Endpoint simples para verificar se o token de autenticação é válido."
+    tags=["Utility"],
+    summary="Verify token",
+    description="Simple endpoint to check if the authentication token is valid."
 )
 async def protected_route(token: str = Security(security)):
     auth.verify_token(token.credentials)
-    return {"mensagem": "Acesso concedido", "token": "ok"}
+    return {"message": "Access granted", "token": "ok"}
 
 
 
 @app.get(
     "/doecho",
-    tags=["Util"],
-    summary="Echo de teste",
-    description="Endpoint simples para teste de conectividade."
+    tags=["Utility"],
+    summary="Test echo",
+    description="Simple endpoint for connectivity testing."
 )
 async def doecho(msg: str = Query(default=None, max_length=50)):
     item = {
             "Method": "doecho", 
-            "Status": "Sucess", 
+            "Status": "Success", 
             "Message": msg
     }
     content = jsonable_encoder(item)
@@ -68,37 +97,40 @@ async def doecho(msg: str = Query(default=None, max_length=50)):
 
 
 @app.get(
-    "/estoque_lojas",
-    tags=["Estoque"],
-    summary="Consulta estoque das lojas",
-    description="Retorna o estoque paginado por loja e produto."
+    "/store_inventory",
+    tags=["Stores"],
+    summary="Query store inventory",
+    description= le_descricao(arquivo="inventory.md"),
+    responses={
+        200: SWAGGER_RESPONSES["store_inventory"]["200"],
+        401: {"description": "Unauthorized"},
+        404: {"description": "Store not found"}
+    }
 )
-async def estoque_lojas(
+async def store_inventory(
     params: vp.EstoqueLojasParams = Depends(),
-    token: str = Depends(auth.verify_token)  # Adiciona a verificação do token como dependência
+    token: str = Depends(auth.verify_token)  # Adds token verification as dependency
 ):
     try:
-        dados = get_dados.dados_estoque(params.page, params.size, params.loja_id)
+        dados = get_dados.dados_estoque(params.page, params.size, params.store_id)
 
         if not dados:
-            raise HTTPException(status_code=404, detail="Loja não encontrada")
+            raise HTTPException(status_code=404, detail="Store not found")
         
-        # Define os cabeçalhos
-        headers = ["cod_portal", "cod_loja", "cnpj_loja", "nome_loja", "cnpj", "nome_loja", "data_estoque", "sku", "qtde_estoque"]
-
-        # Transforma os dados em uma lista de dicionários
-        dados = [dict(zip(headers, linha)) for linha in dados]
+        # Define headers
+        headers = ["store_code","cnpj","sku","product_stock_date","product_stock_quantity"]
+        dados = tradutor.ensure_records(dados, headers)
         item = {
-            "Method": "estoque_lojas", 
-            "Status": "Sucess", 
+            "Method": "store_inventory", 
+            "Status": "Success", 
             "Data": dados
         }
         content = jsonable_encoder(item)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
-            "Method": "estoque_lojas", 
-            "erro": str(e)
+            "Method": "store_inventory", 
+            "error": str(e)
         }
         content = jsonable_encoder(item)
         return JSONResponse(content=content)
@@ -106,37 +138,120 @@ async def estoque_lojas(
 
 
 @app.get(
-    "/imagens_produtos",
-    tags=["Produtos"],
-    summary="Consulta imagens dos produtos",
-    description="Retorna URLs das imagens por referência e cor."
+    "/product_images",
+    tags=["Product"],
+    summary="Query product images",
+    description= le_descricao(arquivo="prd_images.md"),
+    responses={
+        200: SWAGGER_RESPONSES["product_images"]["200"],
+        401: {"description": "Unauthorized"},
+        404: {"description": "Product not found"}
+    }
 )
-async def imagens_produtos(
+async def product_images(
     params: vp.ImagensProdutosParams = Depends(),
     token: str = Depends(auth.verify_token)
 ):
     try:
-        dados = get_dados.dados_img(params.ref, params.cor)
-
+        dados = get_dados.dados_img(params.style_code, params.color_code)
         if not dados:
-            raise HTTPException(status_code=404, detail="Produto não encontrado")
+            raise HTTPException(status_code=404, detail="Product not found")
         
-        # Define os cabeçalhos
-        headers = ["id_produto", "ref", "cor", "seq_imagem", "imagem_url"]
-        # Transforma os dados em uma lista de dicionários
-        dados = [dict(zip(headers, linha)) for linha in dados]        
-        
+        # Define headers
+        headers = ["style_color_code","style_code","color_code","image_sequence","image_url"]
+        dados = tradutor.ensure_records(dados, headers)
         item = {
-            "Method": "imagens_produtos", 
-            "Status": "Sucess",
+            "Method": "product_images", 
+            "Status": "Success",
             "Data": dados
         }
         content = jsonable_encoder(item)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
-            "Method": "imagens_produtos", 
-            "erro": str(e)
+            "Method": "product_images", 
+            "error": str(e)
+        }
+        content = jsonable_encoder(item)
+        return JSONResponse(content=content)
+
+
+
+@app.get(
+    "/store_transactions",
+    tags=["Stores"],
+    summary="Query store transactions",
+    description= le_descricao(arquivo="transactions.md"),
+    responses={
+        200: SWAGGER_RESPONSES["store_transactions"]["200"],
+        401: {"description": "Unauthorized"},
+        404: {"description": "Transactions not found"}
+    }
+)
+async def store_transactions(
+    params: vp.MovimentosLojasParams = Depends(),
+    token: str = Depends(auth.verify_token)    
+):
+    try:
+        dados = get_dados.dados_movimentos(params.store_id, params.start_date, params.end_date, params.page, params.size)
+
+        if not dados:
+            raise HTTPException(status_code=404, detail="Transactions not found")
+        
+        # Define headers
+        headers = ["store_code","cnpj","store_name","transaction_date","sku","color_code","size_code",
+                    "is_canceled","canceled_date","movement_description","operation","invoice_series",
+                    "invoice_number","seller_code","is_sale","movement_status","quantity","net_amount",
+                    "discount_amount","gross_amount"]
+        dados = tradutor.ensure_records(dados, headers)
+        item = {
+            "Method": "store_transactions", 
+            "Status": "Success", 
+            "Data": dados
+        }
+        content = jsonable_encoder(item)
+        return JSONResponse(content=content)
+    except Exception as e:
+        item = {
+            "Method": "store_transactions", 
+            "error": str(e)
+        }
+        content = jsonable_encoder(item)
+        return JSONResponse(content=content)
+
+
+
+@app.get(
+    "/stores",
+    tags=["Stores"],
+    summary="Details of each store",
+    description= le_descricao(arquivo="stores.md")
+)
+async def stores(
+    params: vp.lojasParams = Depends(),
+    token: str = Depends(auth.verify_token)
+):
+    try:
+        dados = get_dados.dados_lojas(params.store_id)
+
+        if not dados:
+            raise HTTPException(status_code=404, detail="No store found")
+        
+        # Define headers
+        headers = ["store_code","cnpj","store_name","store_chain_code","store_chain_name","zip_code","address",
+        "city_code","city_name","state","region_code","region_name","store_size","opening_date","is_open_sunday"]
+        dados = tradutor.ensure_records(dados, headers)
+        item = {
+            "Method": "stores", 
+            "Status": "Success",
+            "Data": dados
+        }
+        content = jsonable_encoder(item)
+        return JSONResponse(content=content)
+    except Exception as e:
+        item = {
+            "Method": "stores", 
+            "error": str(e)
         }
         content = jsonable_encoder(item)
         return JSONResponse(content=content)
@@ -144,38 +259,42 @@ async def imagens_produtos(
 
 
 @app.get(
-    "/movimentos_lojas",
-    tags=["Movimentos"],
-    summary="Consulta movimentos das lojas",
-    description="Retorna vendas, trocas e cancelamentos por período."
+    "/product_catalog",
+    tags=["Product"],
+    summary="Details of each product",
+    description= le_descricao(arquivo="product.md"),
+    responses={
+        200: SWAGGER_RESPONSES["product_catalog"]["200"],
+        401: {"description": "Unauthorized"},
+        404: {"description": "No product found"}
+    }
 )
-async def movimentos_lojas(
-    params: vp.MovimentosLojasParams = Depends(),
-    token: str = Depends(auth.verify_token)    
+async def product_catalog(
+    params: vp.ProductParams = Depends(),
+    token: str = Depends(auth.verify_token)
 ):
     try:
-        dados = get_dados.dados_movimentos(params.start_date, params.end_date, params.page, params.size, params.loja_id)
-
+        dados = get_dados.dados_produtos(params.sku, params.is_active, params.page, params.size)
         if not dados:
-            raise HTTPException(status_code=404, detail="Loja não encontrada")
+            raise HTTPException(status_code=404, detail="No product found")
         
-        # Define os cabeçalhos
-        headers = ["cod_portal", "cod_loja", "cnpj", "nome_loja", "data_lancamento", "canal_distribuicao", "fk_produto",
-                   "cod_barra", "cor", "tamanho", "cancelado", "datcancel", "desc_movimento", "operacao", "rede", "serie",
-                   "numnf", "cod_vendedor", "considerarvenda", "situacao", "qtde", "valor_liquido", "desconto"]
-        # Transforma os dados em uma lista de dicionários
-        dados = [dict(zip(headers, linha)) for linha in dados]
+        # Define headers
+        headers = ["sku","erp_product_code","Style_Color_Code","description","style_code","color_code","color_name","size_code",
+                    "size_name","product_line_code","product_line_name","category_code","category_name","product_type_code",
+                    "product_type_name","collection_code","collection_name","sub_collection_code","sub_collection_name","is_active"]
+
+        dados = tradutor.ensure_records(dados, headers)
         item = {
-            "Method": "movimentos_lojas", 
-            "Status": "Sucess", 
+            "Method": "product_catalog", 
+            "Status": "Success",
             "Data": dados
         }
         content = jsonable_encoder(item)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
-            "Method": "movimentos_lojas", 
-            "erro": str(e)
+            "Method": "product_catalog", 
+            "error": str(e)
         }
         content = jsonable_encoder(item)
         return JSONResponse(content=content)
