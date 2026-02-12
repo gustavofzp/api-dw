@@ -2,8 +2,8 @@
 
 ### Filters:
 - store_code (optional)
-- start_date (optional)
-- end_date (optional)
+- start_date (optional) - (format: YYYY-MM-DD)
+- end_date (optional) - (format: YYYY-MM-DD)
 - page
 - size
 

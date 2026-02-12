@@ -51,10 +51,11 @@ def le_query(arquivo):
 def _count_from_query(cursor, raw_query):
     # remove placeholder de paginação caso exista
     count_subquery = raw_query.replace("--LIMIT <page> OFFSET <size>", "")
+    
     # garante que subquery não tenha trailing semicolons
     count_subquery = count_subquery.rstrip().rstrip(';')
     count_query = f"SELECT COUNT(*) FROM ({count_subquery}) as t"
-    print(f"Executando contagem com query:\n{count_query}")
+
     cursor.execute(count_query)
     total = cursor.fetchone()[0] or 0
     return total
@@ -65,8 +66,8 @@ def _verificar_codigo_loja(loja_id):
     code = loja_id[1:]
     if not loja_id.startswith("L"):
         return("Store_code format incorrect, it should start with 'L'")
-    elif len(code) != 3:
-        return("Store_code format incorrect, it should have more 3 digits after 'L'")
+    elif len(code) <= 1:
+        return("Store_code format incorrect, it should have at least one digit after 'L'")
     elif not code.isdigit():
         return("Store_code format incorrect, it should start with 'L' followed by numeric digits")
     else:
@@ -84,12 +85,11 @@ def dados_estoque(page, size, loja_id):
         query = le_query(arquivo="queries/estoque_lojas.sql")
         
         if loja_id is not None:
-            code = loja_id[1:]
             msg = _verificar_codigo_loja(loja_id)
             if msg is not None:
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
-            query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{code}'")
+            query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{loja_id}'")
         else:
             query = query.replace("    --and loj.cod_portal =", "")
 
@@ -280,9 +280,9 @@ def dados_produtos(sku, is_active, page, size):
         cursor = conn.cursor()
         query = le_query(arquivo="queries/produtos.sql")
         if sku is not None:
-            query = query.replace("    --and prod.sku =", f"   and prod.sku = '{sku}'")
+            query = query.replace("    --and prod.sku_produto =", f"   and prod.sku_produto = '{sku}'")
         else:
-            query = query.replace("    --and prod.sku =", "")
+            query = query.replace("    --and prod.sku_produto =", "")
         
         if is_active is not None:
             query = query.replace("    --and prod.ativo =", f"   and prod.item_ativo = {is_active}")

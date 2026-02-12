@@ -9,11 +9,18 @@
               "Status": "Success",
               "Data": [
                 {
-                  "store_code": "L023",
-                  "cnpj": "12345678000190",
-                  "sku": "1.52473.G.EX2462",
-                  "product_stock_date": "2026-02-01",
-                  "product_stock_quantity": 15
+                  "store_code": "L380",
+                  "cnpj": "35303139010585",
+                  "sku": "...",
+                  "product_stock_date": "2026-02-11T00:00:00",
+                  "product_stock_quantity": -1.0
+                },
+                {
+                  "store_code": "L380",
+                  "cnpj": "35303139010585",
+                  "sku": "...",
+                  "product_stock_date": "2026-02-11T00:00:00",
+                  "product_stock_quantity": -3.0
                 }
               ]
             }

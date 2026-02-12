@@ -23,7 +23,7 @@ from live.dproduto prod
 where 1=1 
     and prod.nivel_estrutura = 1
     and prod.linha_produto not in ('PDV','DAILY')
-    --and prod.sku
+    --and prod.sku_produto =
     --and prod.ativo =
 group by
     prod.sku_produto,
