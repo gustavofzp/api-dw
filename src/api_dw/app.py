@@ -112,20 +112,12 @@ async def store_inventory(
     token: str = Depends(auth.verify_token)  # Adds token verification as dependency
 ):
     try:
-        dados = get_dados.dados_estoque(params.page, params.size, params.store_id)
+        dados = get_dados.dados_estoque(params.page, params.size, params.store_code)
 
         if not dados:
             raise HTTPException(status_code=404, detail="Store not found")
-        
-        # Define headers
-        headers = ["store_code","cnpj","sku","product_stock_date","product_stock_quantity"]
-        dados = tradutor.ensure_records(dados, headers)
-        item = {
-            "Method": "store_inventory", 
-            "Status": "Success", 
-            "Data": dados
-        }
-        content = jsonable_encoder(item)
+
+        content = jsonable_encoder(dados)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
@@ -193,23 +185,12 @@ async def store_transactions(
     token: str = Depends(auth.verify_token)    
 ):
     try:
-        dados = get_dados.dados_movimentos(params.store_id, params.start_date, params.end_date, params.page, params.size)
+        dados = get_dados.dados_movimentos(params.store_code, params.start_date, params.end_date, params.page, params.size)
 
         if not dados:
             raise HTTPException(status_code=404, detail="Transactions not found")
-        
-        # Define headers
-        headers = ["store_code","cnpj","store_name","transaction_date","sku","color_code","size_code",
-                    "is_canceled","canceled_date","movement_description","operation","transaction_type","invoice_series",
-                    "invoice_number","seller_code","is_sale","movement_status","quantity","net_amount",
-                    "discount_amount","gross_amount"]
-        dados = tradutor.ensure_records(dados, headers)
-        item = {
-            "Method": "store_transactions", 
-            "Status": "Success", 
-            "Data": dados
-        }
-        content = jsonable_encoder(item)
+
+        content = jsonable_encoder(dados)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
@@ -237,21 +218,11 @@ async def stores(
     token: str = Depends(auth.verify_token)
 ):
     try:
-        dados = get_dados.dados_lojas(params.store_id)
-
+        dados = get_dados.dados_lojas(params.store_code)
         if not dados:
             raise HTTPException(status_code=404, detail="No store found")
-        
-        # Define headers
-        headers = ["store_code","cnpj","store_name","store_chain_code","store_chain_name","zip_code","address",
-        "city_code","city_name","state","region_code","region_name","store_size","opening_date","is_open_sunday"]
-        dados = tradutor.ensure_records(dados, headers)
-        item = {
-            "Method": "stores", 
-            "Status": "Success",
-            "Data": dados
-        }
-        content = jsonable_encoder(item)
+
+        content = jsonable_encoder(dados)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
@@ -282,19 +253,8 @@ async def product_catalog(
         dados = get_dados.dados_produtos(params.sku, params.is_active, params.page, params.size)
         if not dados:
             raise HTTPException(status_code=404, detail="No product found")
-        
-        # Define headers
-        headers = ["sku","erp_product_code","Style_Color_Code","description","style_code","color_code","color_name","size_code",
-                    "size_name","product_line_code","product_line_name","category_code","category_name","product_type_code",
-                    "product_type_name","collection_code","collection_name","sub_collection_code","sub_collection_name","is_active"]
 
-        dados = tradutor.ensure_records(dados, headers)
-        item = {
-            "Method": "product_catalog", 
-            "Status": "Success",
-            "Data": dados
-        }
-        content = jsonable_encoder(item)
+        content = jsonable_encoder(dados)
         return JSONResponse(content=content)
     except Exception as e:
         item = {

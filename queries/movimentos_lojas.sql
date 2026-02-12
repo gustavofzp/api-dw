@@ -1,4 +1,4 @@
-with lojas as(
+with loj as(
     select
         REPLACE('L' || LPAD(loja.cod_portal::text, 3, '0'), ' ', '') as cod_portal,
         loja.pk_loja as cod_loja,
@@ -10,9 +10,9 @@ with lojas as(
     where loja.cod_rede in (7,8)
 )
 select
-    lojas.cod_portal as store_code,
-    lojas.cnpj,
-    lojas.nome_loja as store_name,
+    loj.cod_portal as store_code,
+    loj.cnpj,
+    loj.nome_loja as store_name,
     mov.data_lancamento as transaction_date,
     split_part(mov.fk_produto, '-', 4) || '.' ||
     split_part(mov.fk_produto, '-', 1) || '.' ||
@@ -41,9 +41,9 @@ select
     mov.desconto as discount_amount,
     mov.valor_bruto as gross_amount
 from jma.fmovimentosinteg mov
-    inner join lojas
-        on lojas.cnpj = mov.cnpj
+    inner join loj
+        on loj.cnpj = mov.cnpj
 where 1=1
     --and mov.data_lancamento between
-    --and lojas.cod_portal =
-LIMIT 10 OFFSET 0
+    --and loj.cod_portal =
+--LIMIT <page> OFFSET <size>

@@ -18,7 +18,5 @@ from live.dlojas loj
 where 1=1
     AND loj.cod_rede IN (6, 12, 7, 18, 8, 36)
     and loj.situacao = 'ativo'
-    --and lojas.cod_portal =
-    --and prd.sku =
-    --and prd.ativo =
+    --and loj.cod_portal =
 --LIMIT <page> OFFSET <size>
