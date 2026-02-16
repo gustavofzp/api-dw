@@ -178,12 +178,11 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
             query = query.replace("   --and mov.data_lancamento between", "")
         
         if loja_id is not None:
-            code = loja_id[1:]
             msg = _verificar_codigo_loja(loja_id)
             if msg is not None:
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
-            query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{code}'")
+            query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{loja_id}'")
         else:
             query = query.replace("    --and loj.cod_portal =", "")
 
