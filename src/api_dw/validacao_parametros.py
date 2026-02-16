@@ -6,6 +6,8 @@ class EstoqueLojasParams(BaseModel):
     page: int = Field(..., ge=1, description="Page number (minimum 1)")
     size: int = Field(..., ge=1, le=1000, description="Page size (between 1 and 1000)")
     store_code: Optional[str] = Field(None, description="Store code (optional)")
+    product_stock_date: Optional[date] = Field(None, description="Stock date in YYYY-MM-DD format (optional)")
+    sku: Optional[str] = Field(None, description="Product SKU (optional)")
 
 
 

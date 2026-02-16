@@ -22,4 +22,5 @@ where 1=1
     and estoque.qtd_estoque <> 0
     and estoque.situacao = '1'
     --and loj.cod_portal =
+    --and estoque.sku =
 --LIMIT <page> OFFSET <size>

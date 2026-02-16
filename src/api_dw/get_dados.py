@@ -54,7 +54,9 @@ def _count_from_query(cursor, raw_query):
     
     # garante que subquery não tenha trailing semicolons
     count_subquery = count_subquery.rstrip().rstrip(';')
-    count_query = f"SELECT COUNT(*) FROM ({count_subquery}) as t"
+    count_query = f"SELECT COUNT(*) FROM ({count_subquery} \n ) as t"
+
+    print("Contando total de registros com query:", count_query)
 
     cursor.execute(count_query)
     total = cursor.fetchone()[0] or 0
@@ -66,7 +68,7 @@ def _verificar_codigo_loja(loja_id):
     code = loja_id[1:]
     if not loja_id.startswith("L"):
         return("Store_code format incorrect, it should start with 'L'")
-    elif len(code) <= 1:
+    elif len(code) < 1:
         return("Store_code format incorrect, it should have at least one digit after 'L'")
     elif not code.isdigit():
         return("Store_code format incorrect, it should start with 'L' followed by numeric digits")
@@ -76,8 +78,9 @@ def _verificar_codigo_loja(loja_id):
 
 
 
-def dados_estoque(page, size, loja_id):
+def dados_estoque(page, size, loja_id, data_estoque, sku):
     conn = get_connection()
+    print(f"Parâmetros recebidos - page: {page}, size: {size}, loja_id: {loja_id}, data_estoque: {data_estoque}, sku: {sku}")
     if conn is None:
         return "Erro ao conectar com o DW."
     try:
@@ -90,19 +93,28 @@ def dados_estoque(page, size, loja_id):
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
             query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{loja_id}'")
-        else:
-            query = query.replace("    --and loj.cod_portal =", "")
+
+        if data_estoque is not None:
+            query = query.replace("    and estoque.data_estoque = (select max(estoque2.data_estoque) from estoque.fsaldoestoqueinteg estoque2)", f"   and estoque.data_estoque = to_date('{data_estoque}','YYYY-MM-DD')")
+
+        if sku is not None:
+            query = query.replace("    --and estoque.sku =", f"     and estoque.sku = '{sku}'")
+        
+        #print("Query após substituição de parâmetros:", query)
 
         # calcula total antes de aplicar LIMIT/OFFSET
         total = _count_from_query(cursor, query)
         # calcula total de páginas
         if size <= 0:
+            print("Erro: size must be > 0")
             raise ValueError("size must be > 0")
         total_pages = math.ceil(total / size)
         
         # aplica paginação
         query = query.replace("--LIMIT <page> OFFSET <size>", f"LIMIT {size} OFFSET {(page-1)*size}")
         
+        print("Query preparada:", query)
+
         cursor.execute(query)
         print("Query executada com sucesso.")
         result = cursor.fetchall()
@@ -174,8 +186,6 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
             else:
                 query = query.replace("   --and mov.data_lancamento between",
                     f"   and mov.data_lancamento between to_date('{start_date}','YYYY-MM-DD') and to_date('{end_date}','YYYY-MM-DD')")
-        else:
-            query = query.replace("   --and mov.data_lancamento between", "")
         
         if loja_id is not None:
             msg = _verificar_codigo_loja(loja_id)
@@ -183,8 +193,6 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
             query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{loja_id}'")
-        else:
-            query = query.replace("    --and loj.cod_portal =", "")
 
         # calcula total antes de aplicar LIMIT/OFFSET
         total = _count_from_query(cursor, query)
@@ -240,8 +248,7 @@ def dados_lojas(loja_id):
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
             query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{code}'")
-        else:
-            query = query.replace("    --and loj.cod_portal =", "")
+
         total = _count_from_query(cursor, query)
         
         cursor.execute(query)
@@ -280,13 +287,9 @@ def dados_produtos(sku, is_active, page, size):
         query = le_query(arquivo="queries/produtos.sql")
         if sku is not None:
             query = query.replace("    --and prod.sku_produto =", f"   and prod.sku_produto = '{sku}'")
-        else:
-            query = query.replace("    --and prod.sku_produto =", "")
         
         if is_active is not None:
             query = query.replace("    --and prod.ativo =", f"   and prod.item_ativo = {is_active}")
-        else:
-            query = query.replace("    --and prod.ativo =", "")
 
         # calcula total antes de aplicar LIMIT/OFFSET
         total = _count_from_query(cursor, query)

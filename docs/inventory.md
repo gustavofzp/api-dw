@@ -7,10 +7,14 @@
 
 ### Filters:
 - store_code (optional)
+- product_stock_date (optional)
+- sku (optional)
 - page
 - size
 
 > If no `store_code` is provided, the API returns inventory positions for all stores in the database. Use the pagination parameters (`page` and `size`) to limit the number of inventory records returned in a single response.
+> If `product_stock_date` is not provided, the API defaults to the most recent stock date available in the database. If an store do not have inventory data for the most recent stock date, it will not be included in the response.
+> If `sku` is not provided, the API returns inventory positions for all SKUs.
 
 ### Returns:
 - store_code - `string`

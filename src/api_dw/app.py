@@ -112,8 +112,7 @@ async def store_inventory(
     token: str = Depends(auth.verify_token)  # Adds token verification as dependency
 ):
     try:
-        dados = get_dados.dados_estoque(params.page, params.size, params.store_code)
-
+        dados = get_dados.dados_estoque(params.page, params.size, params.store_code, params.product_stock_date, params.sku)
         if not dados:
             raise HTTPException(status_code=404, detail="Store not found")
 
