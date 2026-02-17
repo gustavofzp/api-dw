@@ -112,7 +112,7 @@ async def store_inventory(
     token: str = Depends(auth.verify_token)  # Adds token verification as dependency
 ):
     try:
-        dados = get_dados.dados_estoque(params.page, params.size, params.store_code, params.product_stock_date, params.sku)
+        dados = get_dados.dados_estoque(params.page, params.size, params.cnpj, params.store_code, params.product_stock_date, params.sku)
         if not dados:
             raise HTTPException(status_code=404, detail="Store not found")
 
@@ -184,7 +184,7 @@ async def store_transactions(
     token: str = Depends(auth.verify_token)    
 ):
     try:
-        dados = get_dados.dados_movimentos(params.store_code, params.start_date, params.end_date, params.page, params.size)
+        dados = get_dados.dados_movimentos(params.cnpj, params.store_code, params.start_date, params.end_date, params.page, params.size)
 
         if not dados:
             raise HTTPException(status_code=404, detail="Transactions not found")
@@ -217,7 +217,7 @@ async def stores(
     token: str = Depends(auth.verify_token)
 ):
     try:
-        dados = get_dados.dados_lojas(params.store_code)
+        dados = get_dados.dados_lojas(params.cnpj, params.store_code)
         if not dados:
             raise HTTPException(status_code=404, detail="No store found")
 
@@ -258,6 +258,38 @@ async def product_catalog(
     except Exception as e:
         item = {
             "Method": "product_catalog", 
+            "error": str(e)
+        }
+        content = jsonable_encoder(item)
+        return JSONResponse(content=content)
+    
+
+
+@app.get(
+    "/stores_targets",
+    tags=["Stores"],
+    summary="Details of each store",
+    description= le_descricao(arquivo="metas.md"),
+    responses={
+        200: SWAGGER_RESPONSES["stores_targets"]["200"],
+        401: {"description": "Unauthorized"},
+        404: {"description": "No product found"}
+    }
+)
+async def stores_targets(
+    params: vp.metasParams = Depends(),
+    token: str = Depends(auth.verify_token)
+):
+    try:
+        dados = get_dados.dados_metas(params.store_code, params.store_code, params.target_date, params.page, params.size)
+        if not dados:
+            raise HTTPException(status_code=404, detail="No store found")
+
+        content = jsonable_encoder(dados)
+        return JSONResponse(content=content)
+    except Exception as e:
+        item = {
+            "Method": "stores", 
             "error": str(e)
         }
         content = jsonable_encoder(item)

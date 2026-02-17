@@ -5,7 +5,7 @@ with loj as(
         loja.cod_rede,
         loja.rede
     from live.dlojas loja
-    where loja.cod_rede in (7,8)
+    where loja.cod_rede IN (6, 12, 7, 18, 8, 36)
 )
 select
     loj.cod_portal as store_code,
@@ -21,6 +21,7 @@ where 1=1
     and estoque.data_estoque = (select max(estoque2.data_estoque) from estoque.fsaldoestoqueinteg estoque2)
     and estoque.qtd_estoque <> 0
     and estoque.situacao = '1'
+    --and loj.cnpj =
     --and loj.cod_portal =
     --and estoque.sku =
 --LIMIT <page> OFFSET <size>

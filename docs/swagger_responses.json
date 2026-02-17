@@ -158,5 +158,27 @@
           }
         }
       }
+    },
+
+    "stores_targets": {
+      "200": {
+        "description": "Successful response with stores targets data",
+        "content": {
+          "application/json": {
+            "example": {
+              "Method": "stores_targets",
+              "Status": "Success",
+              "Data": [
+                {
+                  "cnpj": "35303139000946",
+                  "store_code": "L199",
+                  "target_date": "2026-01-11",
+                  "target_value": "67451.70"
+                }
+              ]
+            }
+          }
+        }
+      }
     }
 }  

@@ -18,5 +18,6 @@ from live.dlojas loj
 where 1=1
     AND loj.cod_rede IN (6, 12, 7, 18, 8, 36)
     and loj.situacao = 'ativo'
+    --and loj.pk_cnpj =
     --and loj.cod_portal =
 --LIMIT <page> OFFSET <size>

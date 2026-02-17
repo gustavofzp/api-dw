@@ -6,6 +6,7 @@
 - Support replenishment and planning.
 
 ### Filters:
+- cnpj (optional)
 - store_code (optional)
 - product_stock_date (optional)
 - sku (optional)

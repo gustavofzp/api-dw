@@ -7,13 +7,14 @@ with loj as(
         loja.cod_rede,
         loja.rede
     from live.dlojas loja
-    where loja.cod_rede in (7,8)
+    where loja.cod_rede IN (6, 12, 7, 18, 8, 36)
 )
 select
     loj.cod_portal as store_code,
     loj.cnpj,
     loj.nome_loja as store_name,
     mov.data_lancamento as transaction_date,
+    concat(mov.numnf, replace((mov.data_lancamento::date)::text,'-','/' ), mov.loja_original) as transaction_code,
     split_part(mov.fk_produto, '-', 4) || '.' ||
     split_part(mov.fk_produto, '-', 1) || '.' ||
     split_part(mov.fk_produto, '-', 2) || '.' ||
@@ -43,7 +44,9 @@ select
 from jma.fmovimentosinteg mov
     inner join loj
         on loj.cnpj = mov.cnpj
+        and mov.cod_vendedor not in (2546, 4953)
 where 1=1
     --and mov.data_lancamento between
     --and loj.cod_portal =
+    --and loj.cnpj =
 --LIMIT <page> OFFSET <size>

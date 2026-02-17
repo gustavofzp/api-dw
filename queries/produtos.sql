@@ -1,8 +1,8 @@
 select
     prod.sku_produto as sku,
     prod.pk_produto_cigam as erp_product_code,
-    prod.cd_referencia || prod.cd_cor as Style_Color_Code,
-    prod.desc_produto as description,
+    prod.cd_referencia || prod.cd_cor as style_color_code,
+    prod.desc_produto as product_description,
     prod.cd_referencia as style_code,
     prod.cd_cor as color_code,
     prod.nm_cor as color_name,
@@ -10,6 +10,7 @@ select
     prod.nm_tamanho as size_name,
     prod.cod_linha as product_line_code,
     prod.linha_produto as product_line_name,
+    prod.desc_segmento as segment,
     prod.cod_agrupador as category_code,
     prod.desc_agrupador as category_name,
     prod.cod_artigo as product_type_code,

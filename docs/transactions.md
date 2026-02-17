@@ -1,6 +1,7 @@
 ## Returns transactional movements for stores, including sales, exchanges, and cancellations.
 
 ### Filters:
+- cnpj (optional)
 - store_code (optional)
 - start_date (optional) - (format: YYYY-MM-DD)
 - end_date (optional) - (format: YYYY-MM-DD)

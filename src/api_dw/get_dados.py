@@ -56,7 +56,7 @@ def _count_from_query(cursor, raw_query):
     count_subquery = count_subquery.rstrip().rstrip(';')
     count_query = f"SELECT COUNT(*) FROM ({count_subquery} \n ) as t"
 
-    print("Contando total de registros com query:", count_query)
+    #print("Contando total de registros com query:", count_query)
 
     cursor.execute(count_query)
     total = cursor.fetchone()[0] or 0
@@ -78,9 +78,8 @@ def _verificar_codigo_loja(loja_id):
 
 
 
-def dados_estoque(page, size, loja_id, data_estoque, sku):
+def dados_estoque(page, size, cnpj, loja_id, data_estoque, sku):
     conn = get_connection()
-    print(f"Parâmetros recebidos - page: {page}, size: {size}, loja_id: {loja_id}, data_estoque: {data_estoque}, sku: {sku}")
     if conn is None:
         return "Erro ao conectar com o DW."
     try:
@@ -93,6 +92,9 @@ def dados_estoque(page, size, loja_id, data_estoque, sku):
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
             query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{loja_id}'")
+
+        if cnpj is not None:
+            query = query.replace("    --and loj.cnpj =", f"   and loj.cnpj::text = '{cnpj}'")
 
         if data_estoque is not None:
             query = query.replace("    and estoque.data_estoque = (select max(estoque2.data_estoque) from estoque.fsaldoestoqueinteg estoque2)", f"   and estoque.data_estoque = to_date('{data_estoque}','YYYY-MM-DD')")
@@ -171,7 +173,7 @@ def dados_img(ref, cor):
 
 
 
-def dados_movimentos(loja_id, start_date, end_date, page, size):
+def dados_movimentos(cnpj, loja_id, start_date, end_date, page, size):
     conn = get_connection()
     if conn is None:
         return "Erro ao conectar com o DW."
@@ -194,6 +196,9 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
                 raise ValueError(msg)
             query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{loja_id}'")
 
+        if cnpj is not None:
+            query = query.replace("    --and loj.cnpj =", f"   and loj.cnpj::text = '{cnpj}'")
+
         # calcula total antes de aplicar LIMIT/OFFSET
         total = _count_from_query(cursor, query)
         # calcula total de páginas
@@ -207,7 +212,7 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
         
         # Define headers
                 # Define headers
-        headers = ["store_code","cnpj","store_name","transaction_date","sku","color_code","size_code",
+        headers = ["store_code","cnpj","store_name","transaction_date","transaction_code","sku","color_code","size_code",
                     "is_canceled","canceled_date","movement_description","operation","transaction_type","invoice_series",
                     "invoice_number","seller_code","is_sale","movement_status","quantity","net_amount",
                     "discount_amount","gross_amount"]
@@ -233,7 +238,7 @@ def dados_movimentos(loja_id, start_date, end_date, page, size):
 
 
 
-def dados_lojas(loja_id):
+def dados_lojas(cnpj, loja_id):
     conn = get_connection()
     if conn is None:
         return "Erro ao conectar com o DW."
@@ -248,6 +253,9 @@ def dados_lojas(loja_id):
                 print(f"Erro: {msg}")
                 raise ValueError(msg)
             query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{code}'")
+
+        if cnpj is not None:
+            query = query.replace("    --and loj.pk_cnpj =", f"   and loj.pk_cnpj::text = '{cnpj}'")
 
         total = _count_from_query(cursor, query)
         
@@ -303,7 +311,7 @@ def dados_produtos(sku, is_active, page, size):
         cursor.execute(query)
         result = cursor.fetchall()
         # Define headers
-        headers = ["sku","erp_product_code","Style_Color_Code","description","style_code","color_code","color_name","size_code",
+        headers = ["sku","erp_product_code","style_color_code","product_description","style_code","color_code","color_name","size_code",
                     "size_name","product_line_code","product_line_name","category_code","category_name","product_type_code",
                     "product_type_name","collection_code","collection_name","sub_collection_code","sub_collection_name","is_active"]
         result = tradutor.ensure_records(result, headers)
@@ -321,6 +329,65 @@ def dados_produtos(sku, is_active, page, size):
             return item
     except Exception as e:
         print(f"Erro ao buscar produto: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+
+def dados_metas(cnpj, loja_id, target_date, page, size):
+    conn = get_connection()
+    if conn is None:
+        return "Erro ao conectar com o DW."
+    try:
+        cursor = conn.cursor()
+        query = le_query(arquivo="queries/metas.sql")
+        
+        if loja_id is not None:
+            code = loja_id[1:]
+            msg = _verificar_codigo_loja(loja_id)
+            if msg is not None:
+                print(f"Erro: {msg}")
+                raise ValueError(msg)
+            query = query.replace("    --and loj.cod_portal =", f"   and loj.cod_portal = '{code}'")
+        
+        if cnpj is not None:
+            query = query.replace("    --and loj.pk_cnpj =", f"   and loj.pk_cnpj::text = '{cnpj}'")
+
+        if target_date is not None:
+            query = query.replace("    and meta.dt_meta >= TO_DATE('2026-01-01','YYYY/MM/DD')", f"   and meta.data_meta = to_date('{target_date}','YYYY-MM-DD')")
+
+        # calcula total antes de aplicar LIMIT/OFFSET
+        total = _count_from_query(cursor, query)
+        # calcula total de páginas
+        if size <= 0:
+            raise ValueError("size must be > 0")
+        total_pages = math.ceil(total / size)
+        
+        query = query.replace("--LIMIT <page> OFFSET <size>", f"LIMIT {size} OFFSET {(page-1)*size}")
+        
+        cursor.execute(query)
+        result = cursor.fetchall()
+        # Define headers
+        headers = ["cnpj","store_code","target_date","target_value"]
+        result = tradutor.ensure_records(result, headers)
+
+        if result:
+            item = {
+                "Method": "sales_targets", 
+                "Status": "Success",
+                "page": page,
+                "pageSize": size,
+                "totalItems": total,
+                "totalPages": total_pages,
+                "Data": result
+            }
+            return item
+    except ValueError:
+        print("Erro: Store_code format incorrect, it should start with 'L' followed by digits")
+        raise
+    except Exception as e:
+        print(f"Erro ao buscar metas: {e}")
     finally:
         cursor.close()
         conn.close()
