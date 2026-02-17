@@ -308,6 +308,8 @@ def dados_produtos(sku, is_active, page, size):
         
         query = query.replace("--LIMIT <page> OFFSET <size>", f"LIMIT {size} OFFSET {(page-1)*size}")
 
+        print("Query preparada:", query)
+
         cursor.execute(query)
         result = cursor.fetchall()
         # Define headers
@@ -355,7 +357,7 @@ def dados_metas(cnpj, loja_id, target_date, page, size):
             query = query.replace("    --and loj.pk_cnpj =", f"   and loj.pk_cnpj::text = '{cnpj}'")
 
         if target_date is not None:
-            query = query.replace("    and meta.dt_meta >= TO_DATE('2026-01-01','YYYY/MM/DD')", f"   and meta.data_meta = to_date('{target_date}','YYYY-MM-DD')")
+            query = query.replace("    and meta.dt_meta >= TO_DATE('2026-01-01','YYYY/MM/DD')", f"   and meta.dt_meta = to_date('{target_date}','YYYY-MM-DD')")
 
         # calcula total antes de aplicar LIMIT/OFFSET
         total = _count_from_query(cursor, query)

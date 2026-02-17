@@ -283,13 +283,13 @@ async def stores_targets(
     try:
         dados = get_dados.dados_metas(params.store_code, params.store_code, params.target_date, params.page, params.size)
         if not dados:
-            raise HTTPException(status_code=404, detail="No store found")
+            raise HTTPException(status_code=404, detail="stores_targets not found")
 
         content = jsonable_encoder(dados)
         return JSONResponse(content=content)
     except Exception as e:
         item = {
-            "Method": "stores", 
+            "Method": "ststores_targets", 
             "error": str(e)
         }
         content = jsonable_encoder(item)
