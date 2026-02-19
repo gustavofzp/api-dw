@@ -289,7 +289,7 @@ async def stores_targets(
         return JSONResponse(content=content)
     except Exception as e:
         item = {
-            "Method": "ststores_targets", 
+            "Method": "stores_targets", 
             "error": str(e)
         }
         content = jsonable_encoder(item)

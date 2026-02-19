@@ -21,7 +21,7 @@ select
     prod.desc_sub_colecao as sub_collection_name,
     prod.item_ativo as is_active
 from live.dproduto prod
-where 1=1 
+where 1=1
     and prod.nivel_estrutura = 1
     and prod.linha_produto not in ('PDV','DAILY')
     --and prod.sku_produto =
@@ -38,6 +38,7 @@ group by
     prod.nm_tamanho,
     prod.cod_linha,
     prod.linha_produto,
+    prod.desc_segmento,
     prod.cod_agrupador,
     prod.desc_agrupador,
     prod.cod_artigo,

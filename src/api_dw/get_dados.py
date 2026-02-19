@@ -293,6 +293,7 @@ def dados_produtos(sku, is_active, page, size):
     try:
         cursor = conn.cursor()
         query = le_query(arquivo="queries/produtos.sql")
+        print("Query original:", query)
         if sku is not None:
             query = query.replace("    --and prod.sku_produto =", f"   and prod.sku_produto = '{sku}'")
         
